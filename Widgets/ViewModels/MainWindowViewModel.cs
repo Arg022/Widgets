@@ -12,7 +12,7 @@ namespace Widgets.ViewModels;
 public partial class MainWindowViewModel : ViewModelBase
 {
     [ObservableProperty]
-    private bool _isPaneOpen = true;
+    private bool _isPaneOpen = false;
 
     [ObservableProperty]
     private ViewModelBase _currentPage = new HomePageViewModel();
@@ -41,7 +41,7 @@ public partial class MainWindowViewModel : ViewModelBase
     }
     
     [RelayCommand]
-    private void ToggleTheme()
+    private static void ToggleTheme()
     {
         var app = Application.Current;
         if (app is null) return;

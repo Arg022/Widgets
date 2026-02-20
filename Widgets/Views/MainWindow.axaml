@@ -16,7 +16,12 @@
         <vm:MainWindowViewModel/>
     </Design.DataContext>
 
+    
+    
+    
+    <!-- Side bar laterale e gestione delle pagine-->
     <SplitView
+        
         IsPaneOpen="{Binding IsPaneOpen}"
         OpenPaneLength="200"
         CompactPaneLength="48"
