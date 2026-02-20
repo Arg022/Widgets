@@ -20,59 +20,68 @@
         IsPaneOpen="{Binding IsPaneOpen}"
         OpenPaneLength="200"
         CompactPaneLength="48"
-        Background="{DynamicResource ThemeBackgroundBrush}"
-        PaneBackground="{DynamicResource ThemeControlLowBrush}"
+        PaneBackground="{DynamicResource ThemeAccentBrush2}"
         DisplayMode="CompactInline">
 
         <SplitView.Pane>
-            <StackPanel Spacing="5">
-                <Button
-                    HorizontalAlignment="Left"
-                    Background="{DynamicResource ThemeControlLowBrush}"
-                    Command="{Binding TriggerPaneCommand}"
-                    Width="48"
-                    Height="48">
-                    <PathIcon
-                        Data="{StaticResource Hamburger}"
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Center"/>
-
+            <DockPanel LastChildFill="True">
+                <Button DockPanel.Dock="Bottom"
+                        Command="{Binding ToggleThemeCommand}"
+                        Width="48" Height="48"
+                        HorizontalAlignment="Left"
+                        HorizontalContentAlignment="Center"
+                        VerticalContentAlignment="Center"
+                        Background="Transparent">
+                    <PathIcon Data="{StaticResource WeatherSunnyRegular}" />
                 </Button>
+                <StackPanel Spacing="5">
+                    <Button
+                        HorizontalAlignment="Left"
+                        Background="Transparent"
+                        Command="{Binding TriggerPaneCommand}"
+                        Width="48"
+                        Height="48">
+                        <PathIcon
+                            Data="{StaticResource Hamburger}"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"/>
 
-                <ListBox ItemsSource="{Binding Items}"
-                         SelectedItem="{Binding SelectedListItem}">
+                    </Button>
 
-                    <ListBox.Styles>
-                        <Style Selector="ListBoxItem">
-                            <Setter Property="Padding" Value="0"/>
-                            <Setter Property="Margin" Value="0,2"/>
-                            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-                        </Style>
-                    </ListBox.Styles>
+                    <ListBox ItemsSource="{Binding Items}"
+                             SelectedItem="{Binding SelectedListItem}"
+                             Background="Transparent">
 
-                    <ListBox.ItemTemplate>
-                        <DataTemplate DataType="{x:Type vm:ListItemTemplate}">
-                            <Grid ColumnDefinitions="48,*" Height="38">
-                                <PathIcon Grid.Column="0"
-                                          Data="{Binding ListItemIcon}"
-                                          HorizontalAlignment="Center"
-                                          VerticalAlignment="Center"/>
-                                <TextBlock Grid.Column="1"
-                                           Text="{Binding Label}"
-                                           VerticalAlignment="Center"/>
-                            </Grid>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
+                        <ListBox.Styles>
+                            <Style Selector="ListBoxItem">
+                                <Setter Property="Padding" Value="0"/>
+                                <Setter Property="Margin" Value="0,4"/>
+                                <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                            </Style>
+                        </ListBox.Styles>
 
-                </ListBox>
-            </StackPanel>
+                        <ListBox.ItemTemplate>
+                            <DataTemplate DataType="{x:Type vm:ListItemTemplate}">
+                                <Grid ColumnDefinitions="48,*" Height="38">
+                                    <PathIcon Grid.Column="0"
+                                              Data="{Binding ListItemIcon}"
+                                              HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"/>
+                                    <TextBlock Grid.Column="1"
+                                               Text="{Binding Label}"
+                                               VerticalAlignment="Center"/>
+                                </Grid>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+
+                    </ListBox>
+                </StackPanel>
+            </DockPanel>
         </SplitView.Pane>
 
         <SplitView.Content>
-            <Border CornerRadius="12 0 0 0"
-                    Background="#2d2d2d">
-                <TransitioningContentControl Content="{Binding CurrentPage}"/>
-            </Border>
+            <TransitioningContentControl 
+                Content="{Binding CurrentPage}"/>
         </SplitView.Content>
 
     </SplitView>
