@@ -2,7 +2,6 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="Widgets.App"
              xmlns:local="using:Widgets"
-             xmlns:shadUi="clr-namespace:ShadUI;assembly=ShadUI"
              RequestedThemeVariant="Dark">
              <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
 
@@ -10,9 +9,8 @@
         <local:ViewLocator/>
     </Application.DataTemplates>
   
-    <Application.Styles>
-        <shadUi:ShadTheme />
-        <FluentTheme />
-        <StyleInclude Source="avares://Widgets/Assets/Icons.axaml"></StyleInclude>
-    </Application.Styles>
+     <Application.Styles>
+         <FluentTheme/>
+         <StyleInclude Source="avares://Widgets/Assets/Icons.axaml"/>
+     </Application.Styles>
 </Application>
