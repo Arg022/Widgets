@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
+using System;
+using System.IO;
 
 namespace Widgets.Data;
 
@@ -10,8 +12,10 @@ public class AppDbContextDesignFactory
     {
         var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
 
-        // Percorso semplice per migration
-        optionsBuilder.UseSqlite("Data Source=widgets_design.db");
+        var folder = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+        var dbPath = Path.Combine(folder, "WidgetsApp", "collection.db");
+
+        optionsBuilder.UseSqlite($"Data Source={dbPath}");
 
         return new AppDbContext(optionsBuilder.Options);
     }

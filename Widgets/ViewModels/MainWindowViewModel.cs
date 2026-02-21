@@ -6,6 +6,8 @@ using Avalonia.Media;
 using Avalonia.Styling;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
+using Microsoft.Extensions.DependencyInjection;
+using Widgets.Services;
 
 namespace Widgets.ViewModels;
 
@@ -22,17 +24,21 @@ public partial class MainWindowViewModel : ViewModelBase
 
     partial void OnSelectedListItemChanged(ListItemTemplate? value)
     {
-       if (value is null) return;
-       var instance = Activator.CreateInstance(value.ModelType);
-       if (instance is null) return; 
-       CurrentPage = (ViewModelBase)instance;
+        if (value is null) return;
+        var vm = (App.Current as App)!.Services.GetRequiredService(value.ModelType);
+        CurrentPage = (ViewModelBase)vm;
     }
 
-    public ObservableCollection<ListItemTemplate> Items { get; } = new()
+    public ObservableCollection<ListItemTemplate> Items { get; }
+
+    public MainWindowViewModel()
     {
-        new ListItemTemplate(typeof(HomePageViewModel),"Home"),
-        new ListItemTemplate(typeof(ButtonPageViewModel),"CursoHoverRegular")
-    };
+        Items = new()
+        {
+            new ListItemTemplate(typeof(HomePageViewModel),"Home"),
+            new ListItemTemplate(typeof(MangaPageViewModel), "CursorHoverRegular"),
+        };
+    }
     
     [RelayCommand]
     private void TriggerPane()
@@ -64,7 +70,7 @@ public class ListItemTemplate
         ModelType = type;
         Label = type.Name.Replace("PageViewModel", "");
         Application.Current!.TryFindResource(iconKey, out var res);
-        ListItemIcon=(StreamGeometry)res!;
+        ListItemIcon = (StreamGeometry)res!;
     }
     
 }

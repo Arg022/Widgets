@@ -25,7 +25,7 @@
         IsPaneOpen="{Binding IsPaneOpen}"
         OpenPaneLength="200"
         CompactPaneLength="48"
-        PaneBackground="{DynamicResource ThemeAccentBrush2}"
+        PaneBackground="{DynamicResource SystemControlBackgroundChromeMediumBrush}"
         DisplayMode="CompactInline">
 
         <SplitView.Pane>

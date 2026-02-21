@@ -1,0 +1,107 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:manga="clr-namespace:Widgets.ViewModels.Components.Dialogs.Manga"
+        x:Class="Widgets.Views.Components.Dialogs.Manga.AddMangaDialogView"
+        x:DataType="manga:AddMangaDialogViewModel"
+        Title="Aggiungi Manga"
+        Width="420"
+        Height="500"
+        CanResize="False"
+        WindowStartupLocation="CenterOwner"
+        ShowInTaskbar="False">
+
+    <Window.Styles>
+        <Style Selector="TextBlock.label">
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Margin" Value="0,0,0,4"/>
+            <Setter Property="Foreground" Value="{DynamicResource SystemControlForegroundBaseMediumBrush}"/>
+        </Style>
+        <Style Selector="TextBox">
+            <Setter Property="Margin" Value="0,0,0,12"/>
+        </Style>
+    </Window.Styles>
+
+    <Border Padding="24">
+        <Grid RowDefinitions="Auto,*,Auto">
+
+            <!-- HEADER -->
+            <StackPanel Grid.Row="0" Spacing="4" Margin="0,0,0,20">
+                <TextBlock Text="Nuovo Manga"
+                           FontSize="20"
+                           FontWeight="Bold"/>
+                <TextBlock Text="Inserisci i dati del manga da aggiungere alla collezione"
+                           FontSize="12"
+                           Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                           TextWrapping="Wrap"/>
+            </StackPanel>
+
+            <!-- FORM -->
+            <ScrollViewer Grid.Row="1">
+                <StackPanel Spacing="0">
+
+                    <!-- Titolo -->
+                    <TextBlock Text="Titolo *" Classes="label"/>
+                    <TextBox Text="{Binding Title}"
+                             Watermark="es. Berserk"/>
+
+                    <!-- Autore -->
+                    <TextBlock Text="Autore *" Classes="label"/>
+                    <TextBox Text="{Binding Author}"
+                             Watermark="es. Kentaro Miura"/>
+
+                    <!-- Origine -->
+                    <TextBlock Text="Origine" Classes="label"/>
+                    <ComboBox ItemsSource="{Binding Origins}"
+                              SelectedItem="{Binding Origin}"
+                              HorizontalAlignment="Stretch"
+                              Margin="0,0,0,12"/>
+
+                    <!-- Artist -->
+                    <TextBlock Text="Artista (se diverso dall'autore)" Classes="label"/>
+                    <TextBox Text="{Binding Artist}"
+                             Watermark="Opzionale"/>
+
+                    <!-- Volumi / Capitoli -->
+                    <Grid ColumnDefinitions="*,12,*">
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="Volumi totali" Classes="label"/>
+                            <TextBox Text="{Binding TotalVolumes}"
+                                     Watermark="es. 40"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="2">
+                            <TextBlock Text="Capitoli totali" Classes="label"/>
+                            <TextBox Text="{Binding TotalChapters}"
+                                     Watermark="es. 364"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- Anno -->
+                    <TextBlock Text="Anno di uscita" Classes="label"/>
+                    <TextBox Text="{Binding ReleaseYear}"
+                             Watermark="es. 1989"/>
+
+                </StackPanel>
+            </ScrollViewer>
+
+            <!-- FOOTER -->
+            <Grid Grid.Row="2"
+                  ColumnDefinitions="*,8,*"
+                  Margin="0,16,0,0">
+                <Button Grid.Column="0"
+                        Content="Annulla"
+                        Command="{Binding CancelCommand}"
+                        HorizontalAlignment="Stretch"
+                        HorizontalContentAlignment="Center"/>
+                <Button Grid.Column="2"
+                        Content="Aggiungi"
+                        Command="{Binding ConfirmCommand}"
+                        IsEnabled="{Binding CanConfirm}"
+                        Classes="accent"
+                        HorizontalAlignment="Stretch"
+                        HorizontalContentAlignment="Center"/>
+            </Grid>
+
+        </Grid>
+    </Border>
+
+</Window>

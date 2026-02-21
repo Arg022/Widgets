@@ -1,0 +1,268 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+              xmlns:vm="using:Widgets.ViewModels"
+              xmlns:models="using:Widgets.Data.Models"
+              xmlns:i="using:Avalonia.Xaml.Interactivity"
+              xmlns:ia="using:Avalonia.Xaml.Interactions.Core"
+              x:Class="Widgets.Views.MangaPageView"
+              x:DataType="vm:MangaPageViewModel">
+
+    <Design.DataContext>
+        <vm:MangaPageViewModel/>
+    </Design.DataContext>
+
+    <UserControl.Styles>
+        <Style Selector="TextBlock.label">
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="Foreground" Value="{DynamicResource SystemControlForegroundBaseMediumBrush}"/>
+        </Style>
+        <Style Selector="TextBlock.value">
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+        </Style>
+    </UserControl.Styles>
+
+    <!-- Carica i dati quando la pagina diventa visibile -->
+    <i:Interaction.Behaviors>
+        <ia:EventTriggerBehavior EventName="Loaded">
+            <ia:InvokeCommandAction Command="{Binding LoadCommand}"/>
+        </ia:EventTriggerBehavior>
+    </i:Interaction.Behaviors>
+
+    <Grid RowDefinitions="Auto,*">
+
+        <!-- HEADER -->
+        <Grid Grid.Row="0"
+              ColumnDefinitions="*,Auto"
+              Margin="24,20,24,12">
+            <StackPanel Grid.Column="0" Spacing="2">
+                <TextBlock Text="Manga &amp; Manhwa"
+                           FontSize="22"
+                           FontWeight="Bold"/>
+                <TextBlock Text="{Binding Mangas.Count, StringFormat='{}{0} titoli'}"
+                           FontSize="12"
+                           Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"/>
+            </StackPanel>
+
+            <Button Grid.Column="1"
+                    Command="{Binding AddCommand}"
+                    VerticalAlignment="Center">
+                <StackPanel Orientation="Horizontal" Spacing="6">
+                    <PathIcon Data="{StaticResource AddRegular}" Width="14" Height="14"/>
+                    <TextBlock Text="Aggiungi"/>
+                </StackPanel>
+            </Button>
+        </Grid>
+
+        <!-- CONTENT -->
+        <Grid Grid.Row="1" ColumnDefinitions="*,300">
+
+            <!-- LISTA -->
+            <Panel Grid.Column="0">
+
+                <!-- Loading -->
+                <StackPanel IsVisible="{Binding IsLoading}"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Spacing="12">
+                    <ProgressBar IsIndeterminate="True" Width="120"/>
+                    <TextBlock Text="Caricamento..." HorizontalAlignment="Center"/>
+                </StackPanel>
+
+                <!-- Lista vuota -->
+                <StackPanel HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Spacing="8">
+                    <StackPanel.IsVisible>
+                        <MultiBinding Converter="{x:Static BoolConverters.And}">
+                            <Binding Path="!IsLoading"/>
+                            <Binding Path="IsEmpty"/>
+                        </MultiBinding>
+                    </StackPanel.IsVisible>
+                    <TextBlock Text="📖" FontSize="48" HorizontalAlignment="Center"/>
+                    <TextBlock Text="Nessun manga nella collezione"
+                               Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                               HorizontalAlignment="Center"/>
+                </StackPanel>
+
+
+                <!-- Lista manga -->
+                <ListBox ItemsSource="{Binding Mangas}"
+                         SelectedItem="{Binding SelectedManga}"
+                         IsVisible="{Binding !IsLoading}"
+                         Margin="12,0,0,12">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate DataType="{x:Type models:Manga}">
+                            <Grid ColumnDefinitions="48,*,Auto" Margin="4,6">
+
+                                <!-- Cover placeholder -->
+                                <Border Grid.Column="0"
+                                        Width="40" Height="56"
+                                        CornerRadius="4"
+                                        Background="{DynamicResource SystemControlBackgroundChromeMediumBrush}">
+                                    <TextBlock Text="📖"
+                                               FontSize="20"
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center"/>
+                                </Border>
+
+                                <!-- Info -->
+                                <StackPanel Grid.Column="1"
+                                            Margin="12,0,8,0"
+                                            VerticalAlignment="Center"
+                                            Spacing="3">
+                                    <TextBlock Text="{Binding Title}"
+                                               FontWeight="SemiBold"
+                                               FontSize="14"
+                                               TextTrimming="CharacterEllipsis"/>
+                                    <TextBlock Text="{Binding Author}"
+                                               FontSize="12"
+                                               Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"/>
+                                    <StackPanel Orientation="Horizontal" Spacing="6">
+                                        <Border Background="{DynamicResource SystemControlBackgroundChromeMediumBrush}"
+                                                CornerRadius="3"
+                                                Padding="5,2">
+                                            <TextBlock Text="{Binding Origin}" FontSize="10"/>
+                                        </Border>
+                                        <TextBlock Text="{Binding ReadVolumes, StringFormat='Vol. {0}'}"
+                                                   FontSize="11"
+                                                   Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                                                   VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </StackPanel>
+
+                                <!-- Rating -->
+                                <StackPanel Grid.Column="2"
+                                            VerticalAlignment="Center"
+                                            HorizontalAlignment="Right"
+                                            Spacing="2">
+                                    <TextBlock Text="{Binding Rating, StringFormat='⭐ {0:0.0}'}"
+                                               FontSize="12"
+                                               IsVisible="{Binding Rating, Converter={x:Static ObjectConverters.IsNotNull}}"/>
+                                    <TextBlock Text="{Binding Status}"
+                                               FontSize="11"
+                                               Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"/>
+                                </StackPanel>
+
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </Panel>
+
+            <!-- DETTAGLIO -->
+            <Border Grid.Column="1"
+                    BorderThickness="1,0,0,0"
+                    BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}"
+                    IsVisible="{Binding SelectedManga, Converter={x:Static ObjectConverters.IsNotNull}}">
+
+                <ScrollViewer Padding="20">
+                    <StackPanel Spacing="16"
+                                DataContext="{Binding SelectedManga}">
+
+                        <!-- Cover placeholder grande -->
+                        <Border Width="120" Height="170"
+                                CornerRadius="6"
+                                HorizontalAlignment="Center"
+                                Background="{DynamicResource SystemControlBackgroundChromeMediumBrush}">
+                            <TextBlock Text="📖" FontSize="48"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"/>
+                        </Border>
+
+                        <!-- Titolo -->
+                        <StackPanel Spacing="2" HorizontalAlignment="Center">
+                            <TextBlock Text="{Binding Title}"
+                                       FontSize="16" FontWeight="Bold"
+                                       TextAlignment="Center"
+                                       TextWrapping="Wrap"/>
+                            <TextBlock Text="{Binding OriginalTitle}"
+                                       FontSize="12"
+                                       TextAlignment="Center"
+                                       Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                                       IsVisible="{Binding OriginalTitle, Converter={x:Static ObjectConverters.IsNotNull}}"/>
+                        </StackPanel>
+
+                        <Separator/>
+
+                        <!-- Dettagli -->
+                        <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto,Auto" RowSpacing="12">
+                            <StackPanel Grid.Row="0" Grid.Column="0" Spacing="2">
+                                <TextBlock Text="Autore" Classes="label"/>
+                                <TextBlock Text="{Binding Author}" Classes="value"/>
+                            </StackPanel>
+                            <StackPanel Grid.Row="0" Grid.Column="1" Spacing="2">
+                                <TextBlock Text="Origine" Classes="label"/>
+                                <TextBlock Text="{Binding Origin}" Classes="value"/>
+                            </StackPanel>
+                            <StackPanel Grid.Row="1" Grid.Column="0" Spacing="2">
+                                <TextBlock Text="Volumi letti" Classes="label"/>
+                                <TextBlock Classes="value">
+                                    <TextBlock.Text>
+                                        <MultiBinding StringFormat="{}{0} / {1}">
+                                            <Binding Path="ReadVolumes"/>
+                                            <Binding Path="TotalVolumes" TargetNullValue="?"/>
+                                        </MultiBinding>
+                                    </TextBlock.Text>
+                                </TextBlock>
+                            </StackPanel>
+                            <StackPanel Grid.Row="1" Grid.Column="1" Spacing="2">
+                                <TextBlock Text="Capitoli letti" Classes="label"/>
+                                <TextBlock Classes="value">
+                                    <TextBlock.Text>
+                                        <MultiBinding StringFormat="{}{0} / {1}">
+                                            <Binding Path="ReadChapters"/>
+                                            <Binding Path="TotalChapters" TargetNullValue="?"/>
+                                        </MultiBinding>
+                                    </TextBlock.Text>
+                                </TextBlock>
+                            </StackPanel>
+                            <StackPanel Grid.Row="2" Grid.Column="0" Spacing="2">
+                                <TextBlock Text="Stato" Classes="label"/>
+                                <TextBlock Text="{Binding Status}" Classes="value"/>
+                            </StackPanel>
+                            <StackPanel Grid.Row="2" Grid.Column="1" Spacing="2">
+                                <TextBlock Text="Voto" Classes="label"/>
+                                <TextBlock Text="{Binding Rating, StringFormat='{}{0:0.0} / 10'}"
+                                           Classes="value"
+                                           IsVisible="{Binding Rating, Converter={x:Static ObjectConverters.IsNotNull}}"/>
+                                <TextBlock Text="—" Classes="value"
+                                           IsVisible="{Binding Rating, Converter={x:Static ObjectConverters.IsNull}}"/>
+                            </StackPanel>
+                            <StackPanel Grid.Row="3" Grid.Column="0" Spacing="2">
+                                <TextBlock Text="Completato" Classes="label"/>
+                                <TextBlock Text="{Binding IsCompleted, StringFormat='{}{0}'}" Classes="value"/>
+                            </StackPanel>
+                            <StackPanel Grid.Row="3" Grid.Column="1" Spacing="2">
+                                <TextBlock Text="Anno" Classes="label"/>
+                                <TextBlock Text="{Binding ReleaseYear, TargetNullValue='—'}" Classes="value"/>
+                            </StackPanel>
+                        </Grid>
+
+                        <Separator/>
+
+                        <!-- Note -->
+                        <StackPanel Spacing="6"
+                                    IsVisible="{Binding Notes, Converter={x:Static ObjectConverters.IsNotNull}}">
+                            <TextBlock Text="Note" Classes="label"/>
+                            <TextBlock Text="{Binding Notes}"
+                                       TextWrapping="Wrap"
+                                       FontSize="13"/>
+                        </StackPanel>
+
+                        <!-- Elimina -->
+                        <Button Content="Elimina"
+                                Foreground="Red"
+                                Background="Transparent"
+                                HorizontalAlignment="Stretch"
+                                HorizontalContentAlignment="Center"
+                                Command="{Binding $parent[UserControl].((vm:MangaPageViewModel)DataContext).DeleteCommand}"
+                                CommandParameter="{Binding}"/>
+
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+
+        </Grid>
+    </Grid>
+</UserControl>

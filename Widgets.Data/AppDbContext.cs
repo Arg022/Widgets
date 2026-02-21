@@ -5,13 +5,13 @@ namespace Widgets.Data;
 
 public class AppDbContext : DbContext
 {
-    public DbSet<Project> Projects => Set<Project>();
-    public DbSet<KanbanBoard> KanbanBoards => Set<KanbanBoard>();
-    public DbSet<KanbanColumn> KanbanColumns => Set<KanbanColumn>();
-    public DbSet<Sprint> Sprints => Set<Sprint>();
-    public DbSet<WorkItem> WorkItems => Set<WorkItem>();
-    public DbSet<Folder> Folders => Set<Folder>();
-    public DbSet<Note> Notes => Set<Note>();
+    public DbSet<Item>      Items      => Set<Item>();
+    public DbSet<Videogame> Videogames => Set<Videogame>();
+    public DbSet<VideoWork> VideoWorks => Set<VideoWork>();
+    public DbSet<Album>     Albums     => Set<Album>();
+    public DbSet<Book>      Books      => Set<Book>();
+    public DbSet<Manga>     Mangas     => Set<Manga>();
+    public DbSet<Genre>     Genres     => Set<Genre>();
 
     public AppDbContext(DbContextOptions<AppDbContext> options)
         : base(options)
@@ -20,121 +20,93 @@ public class AppDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        // TPT: ogni classe derivata ottiene la propria tabella
+        modelBuilder.Entity<Item>().UseTptMappingStrategy();
+
         // =========================
-        // Project
+        // Item (tabella base)
         // =========================
-        modelBuilder.Entity<Project>(entity =>
+        modelBuilder.Entity<Item>(entity =>
         {
-            entity.HasKey(p => p.Id);
-            entity.HasOne(p => p.KanbanBoard)
-                  .WithOne(b => b.Project)
-                  .HasForeignKey<KanbanBoard>(b => b.ProjectId)
-                  .OnDelete(DeleteBehavior.Cascade);
+            entity.HasKey(i => i.Id);
 
-            entity.HasMany(p => p.Sprints)
-                  .WithOne(s => s.Project)
-                  .HasForeignKey(s => s.ProjectId)
-                  .OnDelete(DeleteBehavior.Cascade);
+            entity.Property(i => i.Status)
+                  .HasDefaultValue("Wishlist");
 
-            entity.HasMany(p => p.WorkItems)
-                  .WithOne(w => w.Project)
-                  .HasForeignKey(w => w.ProjectId)
-                  .OnDelete(DeleteBehavior.Cascade);
+            entity.Property(i => i.AddedAt)
+                  .HasDefaultValueSql("strftime('%Y-%m-%dT%H:%M:%S','now')");
 
-            entity.HasMany(p => p.Folders)
-                  .WithOne(f => f.Project)
-                  .HasForeignKey(f => f.ProjectId)
-                  .OnDelete(DeleteBehavior.Cascade);
+            entity.ToTable(t => t.HasCheckConstraint("CK_Item_Rating",
+                "Rating IS NULL OR (Rating >= 0 AND Rating <= 10)"));
+
+            // N:M con Genre tramite tabella junction ItemGenres
+            entity.HasMany(i => i.Genres)
+                  .WithMany(g => g.Items)
+                  .UsingEntity(j => j.ToTable("ItemGenres"));
         });
 
         // =========================
-        // KanbanBoard
+        // Videogame
         // =========================
-        modelBuilder.Entity<KanbanBoard>(entity =>
+        modelBuilder.Entity<Videogame>(entity =>
         {
-            entity.HasKey(b => b.Id);
-            entity.HasMany(b => b.Columns)
-                  .WithOne(c => c.Board)
-                  .HasForeignKey(c => c.BoardId)
-                  .OnDelete(DeleteBehavior.Cascade);
+            entity.Property(v => v.HoursPlayed).HasDefaultValue(0.0);
+            entity.Property(v => v.Completion).HasDefaultValue(0);
+
+            entity.ToTable(t => t.HasCheckConstraint("CK_Game_Completion",
+                "Completion >= 0 AND Completion <= 100"));
         });
 
         // =========================
-        // KanbanColumn
+        // VideoWork
         // =========================
-        modelBuilder.Entity<KanbanColumn>(entity =>
+        modelBuilder.Entity<VideoWork>(entity =>
         {
-            entity.HasKey(c => c.Id);
-            entity.HasMany(c => c.WorkItems)
-                  .WithOne(w => w.Column)
-                  .HasForeignKey(w => w.ColumnId)
-                  .OnDelete(DeleteBehavior.Restrict);
+            entity.Property(v => v.WatchedEpisodes).HasDefaultValue(0);
         });
 
         // =========================
-        // Sprint
+        // Album
         // =========================
-        modelBuilder.Entity<Sprint>(entity =>
+        modelBuilder.Entity<Album>(entity =>
         {
-            entity.HasKey(s => s.Id);
-            entity.HasMany(s => s.WorkItems)
-                  .WithOne(w => w.Sprint)
-                  .HasForeignKey(w => w.SprintId)
-                  .OnDelete(DeleteBehavior.SetNull); // Sprint opzionale
+            entity.Property(a => a.Format).HasDefaultValue("Digital");
+
+            entity.ToTable(t => t.HasCheckConstraint("CK_Album_Format",
+                "Format IN ('Digital','Vinyl','CD','Cassette')"));
         });
 
         // =========================
-        // WorkItem
+        // Book
         // =========================
-        modelBuilder.Entity<WorkItem>(entity =>
+        modelBuilder.Entity<Book>(entity =>
         {
-            entity.HasKey(w => w.Id);
+            entity.Property(b => b.CurrentPage).HasDefaultValue(0);
 
-            // Parent-Children (self-reference)
-            entity.HasOne(w => w.Parent)
-                  .WithMany(w => w.Children)
-                  .HasForeignKey(w => w.ParentId)
-                  .OnDelete(DeleteBehavior.Restrict);
-
-            // Note collegate
-            entity.HasMany(w => w.Notes)
-                  .WithOne(n => n.WorkItem)
-                  .HasForeignKey(n => n.WorkItemId)
-                  .OnDelete(DeleteBehavior.Cascade);
+            entity.HasIndex(b => b.Isbn).IsUnique();
         });
 
         // =========================
-        // Folder
+        // Manga
         // =========================
-        modelBuilder.Entity<Folder>(entity =>
+        modelBuilder.Entity<Manga>(entity =>
         {
-            entity.HasKey(f => f.Id);
+            entity.Property(m => m.Origin).HasDefaultValue("Manga");
+            entity.Property(m => m.ReadVolumes).HasDefaultValue(0);
+            entity.Property(m => m.ReadChapters).HasDefaultValue(0);
+            entity.Property(m => m.IsCompleted).HasDefaultValue(false);
 
-            // Parent-Children folder
-            entity.HasOne(f => f.ParentFolder)
-                  .WithMany(f => f.SubFolders)
-                  .HasForeignKey(f => f.ParentFolderId)
-                  .OnDelete(DeleteBehavior.Restrict);
-
-            // Notes
-            entity.HasMany(f => f.Notes)
-                  .WithOne(n => n.Folder)
-                  .HasForeignKey(n => n.FolderId)
-                  .OnDelete(DeleteBehavior.Cascade);
+            entity.ToTable(t => t.HasCheckConstraint("CK_Manga_Origin",
+                "Origin IN ('Manga','Manhwa','Manhua','Western', 'Novel')"));
         });
 
         // =========================
-        // Note
+        // Genre
         // =========================
-        modelBuilder.Entity<Note>(entity =>
+        modelBuilder.Entity<Genre>(entity =>
         {
-            entity.HasKey(n => n.Id);
-
-            // Nota legata a WorkItem o Folder, nullable
-            entity.HasCheckConstraint(
-                "CK_Note_OnlyOneOwner",
-                "(FolderId IS NOT NULL AND WorkItemId IS NULL) OR (FolderId IS NULL AND WorkItemId IS NOT NULL) OR (FolderId IS NULL AND WorkItemId IS NULL)"
-            );
+            entity.HasKey(g => g.Id);
+            entity.HasIndex(g => g.Name).IsUnique();
         });
 
         base.OnModelCreating(modelBuilder);
