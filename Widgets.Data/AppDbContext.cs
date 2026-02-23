@@ -20,12 +20,8 @@ public class AppDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        // TPT: ogni classe derivata ottiene la propria tabella
         modelBuilder.Entity<Item>().UseTptMappingStrategy();
-
-        // =========================
-        // Item (tabella base)
-        // =========================
+        
         modelBuilder.Entity<Item>(entity =>
         {
             entity.HasKey(i => i.Id);
@@ -44,10 +40,7 @@ public class AppDbContext : DbContext
                   .WithMany(g => g.Items)
                   .UsingEntity(j => j.ToTable("ItemGenres"));
         });
-
-        // =========================
-        // Videogame
-        // =========================
+        
         modelBuilder.Entity<Videogame>(entity =>
         {
             entity.Property(v => v.HoursPlayed).HasDefaultValue(0.0);
@@ -56,18 +49,12 @@ public class AppDbContext : DbContext
             entity.ToTable(t => t.HasCheckConstraint("CK_Game_Completion",
                 "Completion >= 0 AND Completion <= 100"));
         });
-
-        // =========================
-        // VideoWork
-        // =========================
+        
         modelBuilder.Entity<VideoWork>(entity =>
         {
             entity.Property(v => v.WatchedEpisodes).HasDefaultValue(0);
         });
-
-        // =========================
-        // Album
-        // =========================
+        
         modelBuilder.Entity<Album>(entity =>
         {
             entity.Property(a => a.Format).HasDefaultValue("Digital");
@@ -75,20 +62,14 @@ public class AppDbContext : DbContext
             entity.ToTable(t => t.HasCheckConstraint("CK_Album_Format",
                 "Format IN ('Digital','Vinyl','CD','Cassette')"));
         });
-
-        // =========================
-        // Book
-        // =========================
+        
         modelBuilder.Entity<Book>(entity =>
         {
             entity.Property(b => b.CurrentPage).HasDefaultValue(0);
 
             entity.HasIndex(b => b.Isbn).IsUnique();
         });
-
-        // =========================
-        // Manga
-        // =========================
+        
         modelBuilder.Entity<Manga>(entity =>
         {
             entity.Property(m => m.Origin).HasDefaultValue("Manga");
@@ -99,10 +80,7 @@ public class AppDbContext : DbContext
             entity.ToTable(t => t.HasCheckConstraint("CK_Manga_Origin",
                 "Origin IN ('Manga','Manhwa','Manhua','Western', 'Novel')"));
         });
-
-        // =========================
-        // Genre
-        // =========================
+        
         modelBuilder.Entity<Genre>(entity =>
         {
             entity.HasKey(g => g.Id);
