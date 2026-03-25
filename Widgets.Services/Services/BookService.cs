@@ -2,65 +2,70 @@ using Microsoft.EntityFrameworkCore;
 using Widgets.Data;
 using Widgets.Data.Models;
 
-namespace Widgets.Services;
+namespace Widgets.Services.Services;
 
-public class VideogameService
+public class BookService
 {
     private readonly IDbContextFactory<AppDbContext> _factory;
 
-    public VideogameService(IDbContextFactory<AppDbContext> factory)
+    public BookService(IDbContextFactory<AppDbContext> factory)
     {
         _factory = factory;
     }
 
-    public async Task<Videogame> AddAsync(
-        string title,
-        string platform,
-        string? developer   = null,
+    public async Task<Book> AddAsync(
+        string  title,
+        string  author,
         string? publisher   = null,
+        string? isbn        = null,
+        int?    pages       = null,
+        string? language    = null,
         int?    releaseYear = null,
         string? coverPath   = null)
     {
         await using var db = await _factory.CreateDbContextAsync();
 
-        var item = new Videogame
+        var item = new Book
         {
             Id          = Guid.NewGuid(),
             Title       = title,
-            Platform    = platform,
-            Developer   = developer,
+            Author      = author,
             Publisher   = publisher,
+            Isbn        = isbn,
+            Pages       = pages,
+            Language    = language,
             ReleaseYear = releaseYear,
             CoverPath   = coverPath,
             AddedAt     = DateTime.UtcNow
         };
 
-        db.Videogames.Add(item);
+        db.Books.Add(item);
         await db.SaveChangesAsync();
         return item;
     }
 
-    public async Task<Videogame?> GetByIdAsync(Guid id)
+    public async Task<Book?> GetByIdAsync(Guid id)
     {
         await using var db = await _factory.CreateDbContextAsync();
-        return await db.Videogames
-            .Include(v => v.Genres)
-            .FirstOrDefaultAsync(v => v.Id == id);
+        return await db.Books
+            .Include(b => b.Genres)
+            .FirstOrDefaultAsync(b => b.Id == id);
     }
 
-    public async Task<List<Videogame>> GetAllAsync()
+    public async Task<List<Book>> GetAllAsync()
     {
         await using var db = await _factory.CreateDbContextAsync();
-        return await db.Videogames
-            .Include(v => v.Genres)
-            .OrderBy(v => v.Title)
+        return await db.Books
+            .Include(b => b.Genres)
+            .OrderBy(b => b.Author)
+            .ThenBy(b => b.Title)
             .ToListAsync();
     }
 
-    public async Task UpdateAsync(Videogame item)
+    public async Task UpdateAsync(Book item)
     {
         await using var db = await _factory.CreateDbContextAsync();
-        db.Videogames.Update(item);
+        db.Books.Update(item);
         await db.SaveChangesAsync();
     }
 }

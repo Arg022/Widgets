@@ -20,6 +20,8 @@ public class AppDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        //modelBuilder.Entity<Item>().UseTpcMappingStrategy();
+        //modelBuilder.Entity<Item>().UseTphMappingStrategy();
         modelBuilder.Entity<Item>().UseTptMappingStrategy();
         
         modelBuilder.Entity<Item>(entity =>

@@ -8,6 +8,7 @@
         <entry key="Widgets/Assets/Icons.axaml" value="Widgets/Widgets.csproj" />
         <entry key="Widgets/Views/ButtonPageView.axaml" value="Widgets/Widgets.csproj" />
         <entry key="Widgets/Views/Components/Dialogs/AddMangaDialogView.axaml" value="Widgets/Widgets.csproj" />
+        <entry key="Widgets/Views/Components/Dialogs/Manga/AddMangaDialogView.axaml" value="Widgets/Widgets.csproj" />
         <entry key="Widgets/Views/Components/Dialogs/Manga/UpdateMangaDialogView.axaml" value="Widgets/Widgets.csproj" />
         <entry key="Widgets/Views/HomePageView.axaml" value="Widgets/Widgets.csproj" />
         <entry key="Widgets/Views/MainWindow.axaml" value="Widgets/Widgets.csproj" />

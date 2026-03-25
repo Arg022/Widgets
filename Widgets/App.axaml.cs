@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Widgets.Data;
 using Widgets.Services;
+using Widgets.Services.Services;
 using Widgets.ViewModels;
 using Widgets.Views;
 

@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Widgets.Data;
 using Widgets.Data.Models;
 
-namespace Widgets.Services;
+namespace Widgets.Services.Services;
 
 public class VideoWorkService
 {

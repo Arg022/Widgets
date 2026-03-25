@@ -5,7 +5,7 @@ public class Manga : Item
     public string Author { get; set; } = null!;
     public string? Artist { get; set; }
 
-    /// <summary>Manga (JP) | Manhwa (KR) | Manhua (CN) | OEL</summary>
+    /// <summary>Manga (JP) | Manhwa (KR) | Manhua (CN) | etc</summary>
     public string Origin { get; set; } = "Manga";
 
     public int? TotalVolumes { get; set; }
